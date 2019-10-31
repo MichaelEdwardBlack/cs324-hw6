@@ -1,3 +1,29 @@
+Start the "echoserveri" server in a pane (e.g., pane 4) using the following command line:
+./echoserveri 5599
+
+(The port is arbitrary - it can be anything above 1023).
+
+In three other panes (e.g., 1 - 3), run the following:
+$ nc localhost 5599
+
+(the port should be consistent with what you used to start the server)
+
+After all three are running, type some text in the first of the three panes running "nc", and press enter.  Repeat with the second and third panes.
+
+In a fifth pane (e.g., pane 5), run the following:
+$ ps -Lo user,pid,ppid,nlwp,lwp,vsz,rss,state,ucmd -C echoserveri | grep ^username\\\|USER
+
+The "ps" command lists information about processes that current exist on the system.  The -L option tells us to show threads as if they were processes.  We have selected to show only several fields:
+user: the username of the user running the process (should be your CS username)
+pid: the process ID of the process
+ppid: the process ID of the parent process
+nlwp: the number of threads (light-weight processes) being run
+lwp: the thread ID of the thread
+vsz: the number of bytes of virtual memory potentially used by the process
+rss: the number of bytes of resident memory currently being used by the process
+state: the state of the process, e.g., Running, Sleep, Zombie
+ucmd: the command executed.
+
 Part 1: no concurrency
 
 1. Show the output from the ps command.
@@ -24,11 +50,40 @@ Part 2: Process-based Concurrency
 
 Repeat the exercises from Part 1 (except question 4), replacing all instances of "echoserveri" with "echoserverp".  Answer questions 1 - 3 for "echoserverp" as questions 5 - 7.
 
+5.
+$ ps -Lo user,pid,ppid,nlwp,lwp,vsz,rss,state,ucmd -C echoserverp | grep ^blackli\\\|USER
+USER       PID  PPID NLWP   LWP    VSZ   RSS S CMD
+blackli+  4415  2944    1  4415  10412  1264 S echoserverp
+blackli+  4417  4415    1  4417  10412   124 S echoserverp
+blackli+  4428  4415    1  4428  10412   124 S echoserverp
+blackli+  4430  4415    1  4430  10412   124 S echoserverp
+
+6.
+
+There are 4 threads running. There is the server and the 3 clients.
+There are 4 processes running. There is the server and 3 child processes (clients)
+This is because all the clients established connections with the server
+
+7.
+
+Between all the processes/threads there is 4(10412) = 41,648 bytes of virtual memory being used and 1264+3(124) = 1,636 bytes of residual memory being used
+
 Part 3: Simple Thread-based Concurrency
 
 Repeat the exercises from Part 1 (except question 4), replacing all instances of "echoserveri" with "echoservert".  Answer questions 1 - 3 for "echoservert" as questions 8 - 10.
 
- 
+8.
+$ ps -Lo user,pid,ppid,nlwp,lwp,vsz,rss,state,ucmd -C echoservert | grep ^blackli\\\|USER
+USER       PID  PPID NLWP   LWP    VSZ   RSS S CMD
+blackli+  5026  2944    4  5026 231608  1312 S echoservert
+blackli+  5026  2944    4  5034 231608  1312 S echoservert
+blackli+  5026  2944    4  5042 231608  1312 S echoservert
+blackli+  5026  2944    4  5049 231608  1312 S echoservert
+
+9.
+
+10.
+
 Part 4: Threadpool-based Concurrency
 
 Repeat the exercises from Part 1 (except question 4), replacing all instances of "echoserveri" with "echoservert_pre".  Answer questions 1 - 3 for "echoservert_pre" as questions 11 - 13.
