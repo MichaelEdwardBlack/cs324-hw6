@@ -35,12 +35,12 @@ meb1994  16766 16651    1 16766  10916  2088 S echoserveri
 2. From the ps output, how many processes and how many threads are running, and why?  Use the PID and LWP to identify different threads or processes.
 
 There is one process running and one thread running.
-There is one process because multiple threads run within the context of a single process.
+There is one process because one one connection is being established at a time.
 There is one thread running because only one of the 3 executions of 'nc localhost -PORT' actually made a connection.
 
 3. From the ps output, how much virtual and resident memory are they collectively (i.e., total) using on the system?  Note that memory for a given process should only be counted once, not once for each of its threads.
 
-10916 bytes of virtual memory and 2088 bytes of resident memory totals 13004 bytes of memory
+10,916 bytes of virtual memory and 2,088 bytes of resident memory
 
 4. Enter "Ctrl-c" on the window in which "nc" was first executed to interrupt it.  What happens to the "nc" processes in the other windows?
 
@@ -66,7 +66,7 @@ This is because all the clients established connections with the server
 
 7.
 
-Between all the processes/threads there is 4(10412) = 41,648 bytes of virtual memory being used and 1264+3(124) = 1,636 bytes of residual memory being used
+Between all the processes/threads there is 4(10412) = 41,648 bytes of virtual memory being used and 1264+3(124) = 1,636 bytes of resident memory being used
 
 Part 3: Simple Thread-based Concurrency
 
@@ -82,18 +82,50 @@ blackli+  5026  2944    4  5049 231608  1312 S echoservert
 
 9.
 
+There is one process (only one process ID is shown) and 4 threads.
+This is because multiple threads can run within the context of a single process.
+
 10.
 
+There is a total of 231,608 bytes of virtual memory being used and 1,312 bytes of residual memory
+
 Part 4: Threadpool-based Concurrency
+
+11. $ ps -Lo user,pid,ppid,nlwp,lwp,vsz,rss,state,ucmd -C echoservert_pre | grep ^blackli\\\|USER
+USER       PID  PPID NLWP   LWP    VSZ   RSS S CMD
+blackli+ 12404 11810   11 12404 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12405 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12406 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12407 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12408 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12409 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12410 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12411 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12412 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12413 157912  1240 S echoservert_pre
+blackli+ 12404 11810   11 12414 157912  1240 S echoservert_pre
+
+12.
+
+There is one process running and it is running 11 threads.
+
+13.
+
+There is 157,912 bytes of virtual memory and 1,240 bytes of resident memory
 
 Repeat the exercises from Part 1 (except question 4), replacing all instances of "echoserveri" with "echoservert_pre".  Answer questions 1 - 3 for "echoservert_pre" as questions 11 - 13.
 
 Name at least one pro and one con to each of the concurrent programming paradigms in this assignment.  You can use your own observations, as well as the book chapter.
 
 14. echoserverp
+PROS: Less risident memory used and can run things concurrently.
+CONS: More virtual memory is used...don't know how big of a con that is.
 15. echoservert
+PROS: Less resident memory used and everything runs on a single process concurrently on multiple threads.
+CONS: More virtual memory is used. Even more than the echoserverp.
 16. echoservert_pre
-
+PROS: The least amount of resident memory used. Runs multiple threads concurrently for each connection.
+CONS: Lots of threads may be hard to manage. Lots of virtual memory used.
 
 Consider the code in echoservert_pre.c for the following questions:
 
