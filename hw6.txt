@@ -130,9 +130,22 @@ CONS: Lots of threads may be hard to manage. Lots of virtual memory used.
 Consider the code in echoservert_pre.c for the following questions:
 
 17. Which line of code represents the producer role?  How many producer threads are there?
+
+Line 35 inserts into the buffer which is the role of the producer.
+There are 11 producer roles as there is 1 for each thread. (11 threads allowed in for loop, i = 0; i < 10)
+
 18. Which line of code represents the consumer role?  How many consumer threads are there?
+
+Line 43 removes from the buffer which is the role of the consumer.
+There are also 11 consumer roles as consumers are made inside the same for loop
+
 
 Consider the code in sbuf.c for the following questions (P() is equivalent to sem_wait() and V() is equivalent to sem_post()):
 
 19. On line 30, what happens when the slots member is zero?
+
+Then the consumer will sleep (Producer calls P())
+
 20. In the case that a single consumer thread is sleeping at line 43, waiting for a non-zero value of items, what line of code will be executed by a producer to wake that thread up?
+
+The producer will make a V() call to wake the consumer up (within the insert function)
